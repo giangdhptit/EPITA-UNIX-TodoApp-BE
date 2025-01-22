@@ -11,18 +11,19 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 @Entity
+@Table(name="todo")
 public class TodoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String todoItem;
-    private String completed;
-    public TodoEntity(String todoItem, String completed) {
-        super();
-        this.todoItem = todoItem;
-        this.completed = completed;
-    }
 
+    @Column(nullable = false)
+    private String title;
 
+    @Column(length = 500)
+    private String description;
+
+    @Column(nullable = false)
+    private boolean completed = false;
 
 }

@@ -3,61 +3,35 @@ package org.example.controller;
 import org.example.dto.TodoEntity;
 import org.example.repository.TodoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
-@Controller
+@RestController
+@RequestMapping("/todo")
 public class TodoController {
     @Autowired
     TodoRepository todoRepository;
 
-    @GetMapping
-    public String index() {
-        return "index.html";
+    @GetMapping("/get-all")
+    public List<TodoEntity> getAll() {
+        return todoRepository.findAll();
     }
 
-    @GetMapping("/todos")
-    public String todos(Model model) {
-        model.addAttribute("todos", todoRepository.findAll());
-        return "todos";
+    @GetMapping("/get-by-id")
+    public TodoEntity getById(@PathVariable Long id) {
+        return todoRepository.findById(id).get();
     }
 
-    @PostMapping("/todoNew")
-    public String add(@RequestParam String todoItem, @RequestParam
-    String status, Model model) {
-        TodoEntity todoEntity = new TodoEntity(todoItem, status);
-        todoEntity.setTodoItem(todoItem);
-        todoEntity.setCompleted(status);
-        todoRepository.save(todoEntity);
-        model.addAttribute("todos", todoRepository.findAll());
-        return "redirect:/todos";
+    @PostMapping("/save")
+    public TodoEntity save(@RequestBody TodoEntity todoItem) {
+        return todoRepository.save(todoItem);
     }
 
-    @PostMapping("/todoDelete/{id}")
-    public String delete(@PathVariable long id, Model model) {
+    @DeleteMapping("/delete/{id}")
+    public void delete(@PathVariable long id) {
         todoRepository.deleteById(id);
-        model.addAttribute("todos", todoRepository.findAll());
-        return "redirect:/todos";
     }
 
-    @PostMapping("/todoUpdate/{id}")
-    public String update(@PathVariable long id, Model model) {
-        Optional<TodoEntity> todoOptional = todoRepository.findById(id);
-                TodoEntity todoEntity = todoOptional.get();
-        if("Yes".equals(todoEntity.getCompleted())) {
-            todoEntity.setCompleted("No");
-        }
-        else {
-            todoEntity.setCompleted("Yes");
-        }
-        todoRepository.save(todoEntity);
-        model.addAttribute("todos", todoRepository.findAll());
-        return "redirect:/todos";
-    }
 }

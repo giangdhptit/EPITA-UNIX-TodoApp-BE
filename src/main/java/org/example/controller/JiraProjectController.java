@@ -1,10 +1,13 @@
 package org.example.controller;
 
 import org.example.dto.IssueRequest;
+import org.example.dto.Project;
 import org.example.service.JiraService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/jira/project")
@@ -20,8 +23,8 @@ public class JiraProjectController {
     }
 
     @GetMapping("/get-all")
-    public ResponseEntity<Object> getAll() {
-        Object issue = jiraService.getAllProjects();
+    public ResponseEntity<List<Project>> getAll() throws Exception {
+        List<Project> issue = jiraService.getAllProjects();
         return ResponseEntity.ok(issue);
     }
 

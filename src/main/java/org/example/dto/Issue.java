@@ -11,4 +11,5 @@ public class Issue {
     private String issueKey;
     private String projectKey;
     private String status;
+    private String summary;
 }

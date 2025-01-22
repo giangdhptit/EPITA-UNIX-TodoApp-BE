@@ -18,7 +18,7 @@ public class IssueController {
 
     @PostMapping("/create")
     public ResponseEntity<String> createJiraIssue(@RequestBody IssueRequest issueRequest) {
-        jiraService.createIssueInJira3(issueRequest.getProjectId(), issueRequest.getSummary(), issueRequest.getIssueType());
+        jiraService.createIssueInJira3(issueRequest.getProjectKey(), issueRequest.getSummary());
         return ResponseEntity.ok("Issue created successfully in Jira!");
     }
 

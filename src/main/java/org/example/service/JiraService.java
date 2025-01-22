@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.dto.Issue;
 import org.example.dto.IssueRequest2;
+import org.example.dto.Project;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -37,42 +38,11 @@ public class JiraService {
 //                projectKey, issueType, issueSummary).build();
 //        return issueClient.createIssue(newIssue).claim().getKey();
 //    }
-    public void createIssueInJira(String projectId, String summary, String issueType) {
+
+    public void createIssueInJira3(String projectId, String summary) {
         String apiUrl = "/rest/api/2/issue/";
 
-        IssueRequest2.IssueType issueType1 = new IssueRequest2.IssueType(issueType);
-        IssueRequest2.Project project = new IssueRequest2.Project(projectId);
-        IssueRequest2.Fields fields = new IssueRequest2.Fields(summary,issueType1,project);
-        IssueRequest2 issueRequest = new IssueRequest2(fields);
-        // You need to create IssueRequest class with appropriate fields for your request
-        webClient.post()
-                .uri(apiUrl)
-                .body(BodyInserters.fromValue(issueRequest))
-                .retrieve()
-                .bodyToMono(String.class)
-                .block(); // block() used here for simplicity, handle response asynchronously in production
-    }
-
-    public void createIssueInJira2(IssueRequest2 issue) {
-        String apiUrl = "/rest/api/2/issue/";
-
-//        IssueRequest2.IssueType issueType1 = new IssueRequest2.IssueType(issueType);
-//        IssueRequest2.Project project = new IssueRequest2.Project(projectId);
-//        IssueRequest2.Fields fields = new IssueRequest2.Fields(summary,issueType1,project);
-//        IssueRequest2 issueRequest = new IssueRequest2(fields);
-        // You need to create IssueRequest class with appropriate fields for your request
-        webClient.post()
-                .uri(apiUrl)
-                .body(BodyInserters.fromValue(issue))
-                .retrieve()
-                .bodyToMono(String.class)
-                .block(); // block() used here for simplicity, handle response asynchronously in production
-    }
-
-    public void createIssueInJira3(String projectId, String summary, String issueType) {
-        String apiUrl = "/rest/api/2/issue/";
-
-        IssueRequest2.IssueType issueType1 = new IssueRequest2.IssueType(issueType);
+        IssueRequest2.IssueType issueType1 = new IssueRequest2.IssueType("10008");
         IssueRequest2.Project project = new IssueRequest2.Project(projectId);
         IssueRequest2.Fields fields = new IssueRequest2.Fields(summary,issueType1,project);
         IssueRequest2 issueRequest = new IssueRequest2(fields);
@@ -104,13 +74,14 @@ public class JiraService {
         return this.parseIssues(json);
     }
 
-    public Object getAllProjects() {
+    public List<Project> getAllProjects() throws Exception {
         String apiUrl = "/rest/api/2/project";
-        return webClient.get()
+        String obj = webClient.get()
                 .uri(apiUrl)
                 .retrieve()
-                .bodyToMono(Object.class)
+                .bodyToMono(String.class)
                 .block(); // block() used here for simplicity, handle response asynchronously in production
+        return this.parseProjects(obj);
     }
 
     public void createProject(Object jsonPayload) {
@@ -145,11 +116,28 @@ public class JiraService {
             for (JsonNode issueNode : issuesNode) {
                 Issue issue = new Issue();
                 issue.setIssueKey(issueNode.get("key").asText());
+                issue.setSummary(issueNode.get("fields").get("summary").asText());
                 issue.setProjectKey(issueNode.get("fields").get("project").get("key").asText());
                 issue.setStatus(issueNode.get("fields").get("status").get("name").asText());
                 issues.add(issue);
             }
         }
         return issues;
+    }
+
+    public List<Project> parseProjects(String jsonResponse) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode = objectMapper.readTree(jsonResponse);
+
+        List<Project> projects = new ArrayList<>();
+        if (rootNode.isArray()) {
+            for (JsonNode projectNode : rootNode) {
+                Project project = new Project();
+                project.setKey(projectNode.get("key").asText());
+                project.setName(projectNode.get("name").asText());
+                projects.add(project);
+            }
+        }
+        return projects;
     }
 }

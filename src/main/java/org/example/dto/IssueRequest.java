@@ -9,7 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class IssueRequest {
 
-    private String projectId;
+    private String projectKey;
     private String summary;
     private String issueType;
 

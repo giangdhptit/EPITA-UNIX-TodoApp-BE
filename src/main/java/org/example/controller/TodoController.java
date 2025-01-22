@@ -18,35 +18,44 @@ public class TodoController {
     @Autowired
     TodoService todoService;
 
-    @GetMapping("/get-all")
-    public List<TodoEntity> getAll() {
-        return todoRepository.findAll();
-    }
+    @RestController
+    public class HelloController {
+        @GetMapping("/api/demo-web")
+        public String Hello() {
+            return "Manage your schedule effortlessly with Todoapp!";
+        }
 
-    @GetMapping("/get-by-id/{id}")
-    public TodoEntity getById(@PathVariable Long id) {
-        return todoRepository.findById(id).get();
-    }
 
-    //create
-    @PostMapping("/save")
-    public TodoEntity save(@RequestBody TodoEntity todoItem) {
-        return todoRepository.save(todoItem);
-    }
+        @GetMapping("/get-all")
+        public List<TodoEntity> getAll() {
+            return todoRepository.findAll();
+        }
 
-    @PostMapping("/update/{id}")
-    public TodoEntity update(@PathVariable long id, @RequestBody TodoEntity todoItem) {
-        todoItem.setId(id);
-        return todoRepository.save(todoItem);
-    }
+        @GetMapping("/get-by-id/{id}")
+        public TodoEntity getById(@PathVariable Long id) {
+            return todoRepository.findById(id).get();
+        }
 
-    @DeleteMapping("/delete/{id}")
-    public void delete(@PathVariable long id) {
-        todoRepository.deleteById(id);
-    }
+        //create
+        @PostMapping("/save")
+        public TodoEntity save(@RequestBody TodoEntity todoItem) {
+            return todoRepository.save(todoItem);
+        }
 
-    @GetMapping("/mail")
-    public void mail() {
-         todoService.sendSimpleEmail();
+        @PostMapping("/update/{id}")
+        public TodoEntity update(@PathVariable long id, @RequestBody TodoEntity todoItem) {
+            todoItem.setId(id);
+            return todoRepository.save(todoItem);
+        }
+
+        @DeleteMapping("/delete/{id}")
+        public void delete(@PathVariable long id) {
+            todoRepository.deleteById(id);
+        }
+
+        @GetMapping("/mail")
+        public void mail() {
+            todoService.sendSimpleEmail();
+        }
     }
 }

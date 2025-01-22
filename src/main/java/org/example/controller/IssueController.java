@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/jira/issues")
+@RequestMapping("/jira/issue")
 public class IssueController {
 
     @Autowired

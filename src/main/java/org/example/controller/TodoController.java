@@ -19,7 +19,7 @@ public class TodoController {
         return todoRepository.findAll();
     }
 
-    @GetMapping("/get-by-id")
+    @GetMapping("/get-by-id/{id}")
     public TodoEntity getById(@PathVariable Long id) {
         return todoRepository.findById(id).get();
     }

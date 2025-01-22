@@ -26,14 +26,14 @@ public class TodoService {
     @Value("${email.destination}")
     private String emailDestination;
 
-    // @Scheduled(fixedRate = 30000)  // Uncomment to enable periodic execution
+    @Scheduled(fixedRate = 30000)  // 30 secs
     public void sendSimpleEmail() {
         // Retrieve tasks to notify
-        List<TodoEntity> list = todoRepository.findAll();
+        List<TodoEntity> list = todoRepository.getListToNotify(preNotifyDuration);
 
         // Mail configuration
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost("smtp.zoho.com");
+        mailSender.setHost("smtp.zoho.eu");
         mailSender.setPort(465);  // Use 587 if you enable TLS
         mailSender.setUsername("ag-epita@zohomail.eu");
         mailSender.setPassword("rcm6Xzfdmh9V"); // Ensure no extra spaces
@@ -42,11 +42,12 @@ public class TodoService {
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.ssl.enable", "true");  // Use SSL
-        // props.put("mail.smtp.starttls.enable", "true");  // Uncomment if using TLS
-        props.put("mail.smtp.connectiontimeout", "60000");
-        props.put("mail.smtp.timeout", "60000");
-        props.put("mail.smtp.writetimeout", "60000");
-        props.put("mail.smtp.ssl.trust", "smtp.zoho.com");
+//         props.put("mail.smtp.starttls.enable", "true");  // Uncomment if using TLS
+        props.put("mail.smtp.connectiontimeout", "6000000");
+        props.put("mail.smtp.timeout", "6000000");
+        props.put("mail.smtp.writetimeout", "600000");
+        props.put("mail.smtp.ssl.trust", "smtp.zoho.eu");
+        props.put("mail.debug", "true");
 
         // Send email notifications
         list.forEach(t -> {
@@ -56,6 +57,7 @@ public class TodoService {
             message.setSubject("[Todo by AG] Task Notification");
             message.setText("You have an uncompleted task: " + t.getTitle() + "\n" +
                     "Task Description: " + t.getDescription() + "\n" +
+                    "The deadline is: " + t.getDeadline() + "\n" +
                     "Don't miss it!");
             mailSender.send(message);
         });

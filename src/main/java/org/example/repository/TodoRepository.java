@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface TodoRepository extends JpaRepository<TodoEntity, Long> {
     @Query(value = "SELECT * FROM todo t " +
-            "WHERE DATE_ADD(t.deadline, INTERVAL :duration SECOND) > CURRENT_TIMESTAMP",
+            "WHERE DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 3600 SECOND) > t.deadline AND t.notified=0",
             nativeQuery = true)
     List<TodoEntity> getListToNotify(@Param("duration") Long duration);
 

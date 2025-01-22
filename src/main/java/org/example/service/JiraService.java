@@ -1,5 +1,8 @@
 package org.example.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.dto.Issue;
 import org.example.dto.IssueRequest2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -9,7 +12,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import javax.ws.rs.core.HttpHeaders;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 @Service
 public class JiraService {
@@ -89,13 +94,14 @@ public class JiraService {
                 .block(); // block() used here for simplicity, handle response asynchronously in production
     }
 
-    public Object getAllIssues() {
+    public List<Issue> getAllIssues() throws Exception {
         String apiUrl = "/rest/api/2/search";
-        return webClient.get()
+        String json = webClient.get()
                 .uri(apiUrl)
                 .retrieve()
-                .bodyToMono(Object.class)
+                .bodyToMono(String.class)
                 .block(); // block() used here for simplicity, handle response asynchronously in production
+        return this.parseIssues(json);
     }
 
     public Object getAllProjects() {
@@ -128,5 +134,22 @@ public class JiraService {
                 .block();
     }
 
+    public List<Issue> parseIssues(String jsonResponse) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode = objectMapper.readTree(jsonResponse);
 
+        List<Issue> issues = new ArrayList<>();
+        JsonNode issuesNode = rootNode.get("issues");
+
+        if (issuesNode.isArray()) {
+            for (JsonNode issueNode : issuesNode) {
+                Issue issue = new Issue();
+                issue.setIssueKey(issueNode.get("key").asText());
+                issue.setProjectKey(issueNode.get("fields").get("project").get("key").asText());
+                issue.setStatus(issueNode.get("fields").get("status").get("name").asText());
+                issues.add(issue);
+            }
+        }
+        return issues;
+    }
 }

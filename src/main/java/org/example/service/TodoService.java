@@ -26,7 +26,7 @@ public class TodoService {
     @Value("${email.destination}")
     private String emailDestination;
 
-    @Scheduled(fixedRate = 30000)  // 30 secs
+//    @Scheduled(fixedRate = 30000)  // 30 secs
     public void sendSimpleEmail() {
         // Retrieve tasks to notify
         List<TodoEntity> list = todoRepository.getListToNotify(preNotifyDuration);

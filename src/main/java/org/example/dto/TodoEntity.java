@@ -32,6 +32,6 @@ public class TodoEntity {
     @Column()
     private Date deadline;
 
-    @Column()
+    @Column(nullable = false)
     private boolean notified = false;
 }

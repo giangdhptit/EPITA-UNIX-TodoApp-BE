@@ -28,8 +28,15 @@ public class TodoController {
         return todoRepository.findById(id).get();
     }
 
+    //create
     @PostMapping("/save")
     public TodoEntity save(@RequestBody TodoEntity todoItem) {
+        return todoRepository.save(todoItem);
+    }
+
+    @PostMapping("/update/{id}")
+    public TodoEntity update(@PathVariable long id, @RequestBody TodoEntity todoItem) {
+        todoItem.setId(id);
         return todoRepository.save(todoItem);
     }
 
